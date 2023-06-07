@@ -1,0 +1,8 @@
+services:
+  cicd:
+    build:
+      context: .
+      dockerfile: ./.container/cicd/Dockerfile
+    volumes:
+      - .:/workspace
+    tty: true

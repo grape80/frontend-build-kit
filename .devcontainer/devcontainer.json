@@ -1,0 +1,23 @@
+{
+	"dockerComposeFile": "../compose.yaml",
+	"service": "cicd",
+	"workspaceFolder": "/workspace",
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"workbench.startupEditor": "none",
+				"git.enableSmartCommit": true,
+				"editor.renderWhitespace": "all",
+				"editor.formatOnSave": true,
+				"files.autoSave": "afterDelay",
+				"files.associations": {
+					"*.gotmpl": "html",
+					"*.partial": "html"
+				}
+			},
+			"extensions": [
+				"redhat.vscode-yaml"
+			]
+		}
+	}
+}

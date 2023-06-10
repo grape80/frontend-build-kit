@@ -5,6 +5,8 @@ RUN apt-get update \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
+RUN go install github.com/grape80/gotmpl2html/cmd/gotmpl2html@latest
+
 WORKDIR /workspace
 
 RUN useradd -u 1001 -m nonroot && chown nonroot:nonroot -R /workspace

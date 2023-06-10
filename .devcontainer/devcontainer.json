@@ -13,10 +13,19 @@
 				"files.associations": {
 					"*.gotmpl": "html",
 					"*.partial": "html"
+				},
+				"emeraldwalk.runonsave": {
+					"commands": [
+						{
+							"match": "\\.gotmpl$",
+							"cmd": "gotmpl2html --basedir=src/app ${file} > ${workspaceFolder}/live/app/${fileBasenameNoExt}.html"
+						}
+					]
 				}
 			},
 			"extensions": [
-				"redhat.vscode-yaml"
+				"redhat.vscode-yaml",
+				"emeraldwalk.RunOnSave"
 			]
 		}
 	}

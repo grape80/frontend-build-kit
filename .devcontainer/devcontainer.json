@@ -4,6 +4,12 @@
 	"workspaceFolder": "/workspace",
 	"customizations": {
 		"vscode": {
+			"extensions": [
+				"redhat.vscode-yaml",
+				"emeraldwalk.RunOnSave",
+				"ms-vscode.live-server",
+				"glenn2223.live-sass"
+			],
 			"settings": {
 				"workbench.startupEditor": "none",
 				"git.enableSmartCommit": true,
@@ -22,13 +28,17 @@
 						}
 					]
 				},
-				"livePreview.serverRoot": "live/"
-			},
-			"extensions": [
-				"redhat.vscode-yaml",
-				"emeraldwalk.RunOnSave",
-				"ms-vscode.live-server"
-			]
+				"livePreview.serverRoot": "live/",
+				"liveSassCompile.settings.formats": [
+					{
+						"format": "expanded",
+						"extensionName": ".css",
+						"savePathReplacementPairs": {
+							"/src": "/live"
+						}
+					}
+				]
+			}
 		}
 	}
 }

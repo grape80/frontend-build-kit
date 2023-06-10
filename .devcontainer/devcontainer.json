@@ -21,11 +21,13 @@
 							"cmd": "gotmpl2html --basedir=src/app ${file} > ${workspaceFolder}/live/app/${fileBasenameNoExt}.html"
 						}
 					]
-				}
+				},
+				"livePreview.serverRoot": "live/"
 			},
 			"extensions": [
 				"redhat.vscode-yaml",
-				"emeraldwalk.RunOnSave"
+				"emeraldwalk.RunOnSave",
+				"ms-vscode.live-server"
 			]
 		}
 	}

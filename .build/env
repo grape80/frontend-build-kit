@@ -1,0 +1,12 @@
+APP_NAME=app
+SRC_DIR=src
+SRC_IMG_DIR=${SRC_DIR}/${APP_NAME}/images
+SRC_SCSS_DIR=${SRC_DIR}/${APP_NAME}/styles
+SRC_JS_DIR=${SRC_DIR}/${APP_NAME}/scripts
+LOG_DIR=log
+LOG_BUILD_DIR=${LOG_DIR}/build
+LOG_TEST_DIR=${LOG_DIR}/test
+LOG_RELEASE_DIR=${LOG_DIR}/release
+DIST_DIR=dist
+TMP_DIR=tmp
+LIVE_DIR=live

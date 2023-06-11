@@ -1,0 +1,16 @@
+{{define "_gheader.partial" }}
+{{data "_gheader.partial.json" }}
+<header id="_gheader">
+    <hgroup>
+        <h1>{{ ._gheader.h1 }}</h1>
+        <p>{{ ._gheader.p }}</p>
+    </hgroup>
+    <nav id="gnav">
+        <ul>
+            <li><a href="#">AAA</a></li>
+            <li><a href="#">BBB</a></li>
+            <li><a href="#">CCC</a></li>
+        </ul>
+    </nav>
+</header>
+{{end}}

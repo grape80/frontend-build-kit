@@ -1,0 +1,20 @@
+{{data "top.gotmpl.json" }}
+<html lang="en">
+
+<head>
+    {{template "_cmeta.partial" }}
+    <meta name="description" content="{{ .Top.description }}">
+    <base href="/live/app/">
+    <title>{{ .Top.title }}</title>
+</head>
+
+<body>
+    <div id="container">
+        {{template "_gheader.partial" . }}
+        <main>
+        </main>
+        {{template "_gfooter.partial" }}
+    </div>
+</body>
+
+</html>

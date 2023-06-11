@@ -1,0 +1,7 @@
+{{define "_gfooter.partial" }}
+<footer>
+    <p>
+        Thanks to all <a href="https://github.com/grape80/frontend-build-kit/graphs/contributors">contributors</a>.
+    </p>
+</footer>
+{{end}}

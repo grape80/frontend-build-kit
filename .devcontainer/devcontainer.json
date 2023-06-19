@@ -24,11 +24,15 @@
 					"commands": [
 						{
 							"match": "\\.gotmpl$",
-							"cmd": "gotmpl2html --basedir=src/app ${file} > ${workspaceFolder}/live/app/${fileBasenameNoExt}.html"
+							"cmd": "sh htmlbundle.sh --dest=live ${relativeFile}"
+						},
+						{
+							"match": "\\.js$",
+							"notMatch": "/_.*\\.js$",
+							"cmd": "sh jsbundle.sh --dest=live ${relativeFile}"
 						}
 					]
 				},
-				"livePreview.serverRoot": "live/",
 				"liveSassCompile.settings.formats": [
 					{
 						"format": "expanded",

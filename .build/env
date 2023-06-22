@@ -1,12 +1,25 @@
-APP_NAME=app
+APP_DIR=app
+
+IMG_DIR=images
+CSS_DIR=styles
+JS_DIR=scripts
+
+# html
+EXT_HTML_TMPL=.gotmpl
+
+# js
+EXT_BUNDLE_JS=.bundle.js
+EXT_MIN_JS=.min.js
+
 SRC_DIR=src
-SRC_IMG_DIR=${SRC_DIR}/${APP_NAME}/images
-SRC_SCSS_DIR=${SRC_DIR}/${APP_NAME}/styles
-SRC_JS_DIR=${SRC_DIR}/${APP_NAME}/scripts
+
+LIVE_DIR=live
+
+TMP_DIR=tmp
+
+DIST_DIR=dist
+
 LOG_DIR=log
 LOG_BUILD_DIR=${LOG_DIR}/build
 LOG_TEST_DIR=${LOG_DIR}/test
 LOG_RELEASE_DIR=${LOG_DIR}/release
-DIST_DIR=dist
-TMP_DIR=tmp
-LIVE_DIR=live

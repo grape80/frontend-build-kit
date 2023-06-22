@@ -2,12 +2,21 @@ MAKEFLAGS += --no-builtin-rules
 .DEFAULT_GOAL := help
 
 include .build/env
-app := $(APP_NAME)
-logDir := $(LOG_DIR)
-logTestDir := $(LOG_TEST_DIR)
-distDir := $(DIST_DIR)
-tmpDir := $(TMP_DIR)
+
+srcDir := $(SRC_DIR)
 liveDir := $(LIVE_DIR)
+tmpDir := $(TMP_DIR)
+distDir := $(DIST_DIR)
+logDir := $(LOG_DIR)
+
+# js
+appJSDir := $(APP_DIR)/$(JS_DIR)
+extBundleJS := $(EXT_BUNDLE_JS)
+extMinJS := $(EXT_MIN_JS)
+
+entryJS := $(shell find $(srcDir)/$(appJSDir) -type f -print | grep -v '/_.*\.js$$')
+bundleJS := $(patsubst $(srcDir)/%, $(distDir)/%, $(entryJS:.js=$(extBundleJS)))
+minJS := $(bundleJS:$(extBundleJS)=$(extMinJS))
 
 now = $(shell date '+%Y%m%d-%H%M%S')
 
@@ -16,24 +25,36 @@ help:
 	@cat $(MAKEFILE_LIST) | grep '##' | grep -v 'MAKEFILE_LIST' | sed s/^.PHONY:// | awk -F \#\# '{ printf "%-20s%s\n", $$1, $$2 }'
 
 ##
-.PHONY: cssbuild ## Build css.
-cssbuild:
-
 .PHONY: imgbuild ## Build img.
 imgbuild:
 
+.PHONY: cssbuild ## Build css.
+cssbuild:
+
 .PHONY: jsbuild ## Build js.
-jsbuild:
+jsbuild: jsbundle jsminify
+
+.PHONY: jsbundle ## Bundle js.
+jsbundle: $(bundleJS)
+
+$(distDir)/%$(extBundleJS): $(srcDir)/%.js
+	sh jsbundler.sh --src=$(srcDir) --dest=$(distDir) $<
+
+.PHONY: jsminify ## Minify js.
+jsminify: $(minJS)
+
+$(distDir)/%$(extMinJS): $(distDir)/%$(extBundleJS)
+	sh jsminifier.sh --src=$(distDir) --dest=$(distDir) $<
 
 .PHONY: htmlbuild ## Build html.
 htmlbuild:
 
 ##
-.PHONY: csstest ## Build css test.
-csstest:
-
 .PHONY: imgtest ## Build img test.
 imgtest:
+
+.PHONY: csstest ## Build css test.
+csstest:
 
 .PHONY: jstest ## Build js test.
 jstest:
@@ -43,10 +64,10 @@ htmltest:
 
 ##
 .PHONY: build ## Build all.
-build: cssbuild imgbuild jsbuild htmlbuild
+build: imgbuild cssbuild jsbuild htmlbuild
 
 .PHONY: test ## Test all.
-test: csstest imgtest jstest htmltest
+test: imgtest csstest jstest htmltest
 
 .PHONY: release ## Build release.
 release:

@@ -5,13 +5,6 @@ CSS_DIR=styles
 JS_DIR=scripts
 L10N_DIR=_l10n
 
-# html
-EXT_HTML_TMPL=.gotmpl
-
-# js
-EXT_BUNDLE_JS=.bundle.js
-EXT_MIN_JS=.min.js
-
 SRC_DIR=src
 
 LIVE_DIR=live
@@ -24,3 +17,13 @@ LOG_DIR=log
 LOG_BUILD_DIR=${LOG_DIR}/build
 LOG_TEST_DIR=${LOG_DIR}/test
 LOG_RELEASE_DIR=${LOG_DIR}/release
+
+# js
+EXT_ENTRY_JS=.js
+EXT_BUNDLE_JS=.bundle.js
+EXT_MIN_JS=.min.js
+
+# html
+EXT_TMPL_HTML=.gotmpl
+EXT_BUNDLE_HTML=.html
+EXT_MIN_HTML=.html

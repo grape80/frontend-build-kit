@@ -24,12 +24,12 @@
 					"commands": [
 						{
 							"match": "\\.gotmpl$",
-							"cmd": "sh htmlbundle.sh --dest=live ${relativeFile}"
+							"cmd": "sh htmlbundler.sh --src=src/app --dest=live/app ${relativeFile}"
 						},
 						{
 							"match": "\\.js$",
 							"notMatch": "/_.*\\.js$",
-							"cmd": "sh jsbundle.sh --dest=live ${relativeFile}"
+							"cmd": "sh jsbundler.sh --src=src/app/scripts --dest=live/app/scripts ${relativeFile}"
 						}
 					]
 				},

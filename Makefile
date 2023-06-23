@@ -13,18 +13,23 @@ l10nDir := $(L10N_DIR)
 
 # js
 appJSDir := $(APP_DIR)/$(JS_DIR)
+extEntryJS := $(EXT_ENTRY_JS)
 extBundleJS := $(EXT_BUNDLE_JS)
 extMinJS := $(EXT_MIN_JS)
 
-entryJS := $(shell find $(srcDir)/$(appJSDir) -type f -name '*.js' -print | grep -v '/_.*\.js$$')
-bundleJS := $(patsubst $(srcDir)/%, $(distDir)/%, $(entryJS:.js=$(extBundleJS)))
-minJS := $(bundleJS:$(extBundleJS)=$(extMinJS))
+entryJS := $(shell find $(srcDir)/$(appJSDir) -type f -name '*$(extEntryJS)' -print | grep -v '/_.*\$(extEntryJS)$$')
+bundleJS := $(patsubst $(srcDir)/%, $(tmpDir)/%, $(entryJS:$(extEntryJS)=$(extBundleJS)))
+minJS := $(patsubst $(tmpDir)/%, $(distDir)/%, $(bundleJS:$(extBundleJS)=$(extMinJS)))
 
 # html
-extHtmlTmpl := $(EXT_HTML_TMPL)
+appHTMLDir := $(APP_DIR)
+extTmplHTML := $(EXT_TMPL_HTML)
+extBundleHTML := $(EXT_BUNDLE_HTML)
+extMinHTML := $(EXT_MIN_HTML)
 
-htmlTmpl := $(shell find $(srcDir)/$(appDir) -type f -name '*$(extHtmlTmpl)' -print | grep -v '.*/$(l10nDir)/.*')
-html := $(patsubst $(srcDir)/%, $(distDir)/%, $(htmlTmpl:$(extHtmlTmpl)=.html))
+tmplHTML := $(shell find $(srcDir)/$(appHTMLDir) -type f -name '*$(extTmplHTML)' -print | grep -v '.*/$(l10nDir)/.*')
+bundleHTML := $(patsubst $(srcDir)/%, $(tmpDir)/%, $(tmplHTML:$(extTmplHTML)=$(extBundleHTML)))
+minHTML := $(patsubst $(tmpDir)/%, $(distDir)/%, $(bundleHTML:$(extBundleHTML)=$(extMinHTML)))
 
 now = $(shell date '+%Y%m%d-%H%M%S')
 
@@ -45,23 +50,30 @@ jsbuild: jsbundle jsminify
 .PHONY: jsbundle ## Bundle js.
 jsbundle: $(bundleJS)
 
-$(distDir)/%$(extBundleJS): $(srcDir)/%.js
-	sh jsbundler.sh --src=$(srcDir) --dest=$(distDir) $<
+$(tmpDir)/%$(extBundleJS): $(srcDir)/%$(extEntryJS)
+	sh jsbundler.sh --src=$(srcDir)/$(appJSDir) --dest=$(tmpDir)/$(appJSDir) $<
 
 .PHONY: jsminify ## Minify js.
 jsminify: $(minJS)
 
-$(distDir)/%$(extMinJS): $(distDir)/%$(extBundleJS)
-	sh jsminifier.sh --src=$(distDir) --dest=$(distDir) $<
+$(distDir)/%$(extMinJS): $(tmpDir)/%$(extBundleJS)
+	sh jsminifier.sh --src=$(tmpDir)/$(appJSDir) --dest=$(distDir)/$(appJSDir) $<
 
+##
 .PHONY: htmlbuild ## Build html.
-htmlbuild: htmlbundle
+htmlbuild: htmlbundle htmlminify
 
 .PHONY: htmlbundle ## Bundle html.
-htmlbundle: $(html)
+htmlbundle: $(bundleHTML)
 
-$(distDir)/%.html: $(srcDir)/%$(extHtmlTmpl)
-	sh htmlbundler.sh --dest=$(distDir) $<
+$(tmpDir)/%$(extBundleHTML): $(srcDir)/%$(extTmplHTML)
+	sh htmlbundler.sh --src=$(srcDir)/$(appHTMLDir) --dest=$(tmpDir)/$(appHTMLDir) $<
+
+.PHONY: htmlminify ## Minify html.
+htmlminify: $(minHTML)
+
+$(distDir)/%$(extMinHTML): $(tmpDir)/%$(extBundleHTML)
+	sh htmlminifier.sh --src=$(tmpDir)/$(appHTMLDir) --dest=$(distDir)/$(appHTMLDir) $<
 
 ##
 .PHONY: imgtest ## Build img test.

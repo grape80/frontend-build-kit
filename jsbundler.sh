@@ -2,13 +2,18 @@
 
 . .build/env
 
+extEntry=$EXT_ENTRY_JS
 extBundle=$EXT_BUNDLE_JS
 
 src=$(echo $1 | cut -d '=' -f 2)
 dest=$(echo $2 | cut -d '=' -f 2)
-entryJS=$3
+entry=$3
 
-bundleJS=$(echo $entryJS | sed -e "s:^$src:$dest:" -e "s/\\.js$/\\$extBundle/")
+bundle=$(echo $entry | sed -e "s:^$src:$dest:" -e "s/\\$extEntry$/\\$extBundle/")
 
-mkdir -p $(dirname $bundleJS)
-esbuild $entryJS --bundle --sourcemap --outfile=$bundleJS
+mkdir -p $(dirname $bundle)
+esbuild \
+    --bundle \
+    --sourcemap \
+    --outfile=$bundle \
+    $entry

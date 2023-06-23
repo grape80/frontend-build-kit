@@ -7,6 +7,7 @@ RUN apt-get update \
 
 RUN go install github.com/grape80/gotmpl2html/cmd/gotmpl2html@latest
 RUN cd $GOPATH/bin && curl -fsSL https://esbuild.github.io/dl/latest | sh
+RUN go install github.com/tdewolff/minify/v2/cmd/minify@latest
 
 WORKDIR /workspace
 

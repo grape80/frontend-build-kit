@@ -2,14 +2,16 @@
 
 . .build/env
 
-app=$APP_DIR
-extTmpl=$EXT_HTML_TMPL
+extTmpl=$EXT_TMPL_HTML
+extBundle=$EXT_BUNDLE_HTML
 
-src=$SRC_DIR
-dest=$(echo $1 | cut -d '=' -f 2)
-tmpl=$2
+src=$(echo $1 | cut -d '=' -f 2)
+dest=$(echo $2 | cut -d '=' -f 2)
+tmpl=$3
 
-html=$(echo $tmpl | sed -e "s:^$src:$dest:" -e "s/\\$extTmpl$/\\.html/")
+bundle=$(echo $tmpl | sed -e "s:^$src:$dest:" -e "s/\\$extTmpl$/\\$extBundle/")
 
-mkdir -p $(dirname $html)
-gotmpl2html --basedir=$src/$app $tmpl > $html
+mkdir -p $(dirname $bundle)
+gotmpl2html \
+    --basedir=$src \
+    $tmpl > $bundle

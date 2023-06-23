@@ -3,6 +3,7 @@ APP_DIR=app
 IMG_DIR=images
 CSS_DIR=styles
 JS_DIR=scripts
+L10N_DIR=_l10n
 
 # html
 EXT_HTML_TMPL=.gotmpl

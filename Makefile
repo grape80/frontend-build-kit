@@ -3,20 +3,28 @@ MAKEFLAGS += --no-builtin-rules
 
 include .build/env
 
+appDir := $(APP_DIR)
 srcDir := $(SRC_DIR)
 liveDir := $(LIVE_DIR)
 tmpDir := $(TMP_DIR)
 distDir := $(DIST_DIR)
 logDir := $(LOG_DIR)
+l10nDir := $(L10N_DIR)
 
 # js
 appJSDir := $(APP_DIR)/$(JS_DIR)
 extBundleJS := $(EXT_BUNDLE_JS)
 extMinJS := $(EXT_MIN_JS)
 
-entryJS := $(shell find $(srcDir)/$(appJSDir) -type f -print | grep -v '/_.*\.js$$')
+entryJS := $(shell find $(srcDir)/$(appJSDir) -type f -name '*.js' -print | grep -v '/_.*\.js$$')
 bundleJS := $(patsubst $(srcDir)/%, $(distDir)/%, $(entryJS:.js=$(extBundleJS)))
 minJS := $(bundleJS:$(extBundleJS)=$(extMinJS))
+
+# html
+extHtmlTmpl := $(EXT_HTML_TMPL)
+
+htmlTmpl := $(shell find $(srcDir)/$(appDir) -type f -name '*$(extHtmlTmpl)' -print | grep -v '.*/$(l10nDir)/.*')
+html := $(patsubst $(srcDir)/%, $(distDir)/%, $(htmlTmpl:$(extHtmlTmpl)=.html))
 
 now = $(shell date '+%Y%m%d-%H%M%S')
 
@@ -47,7 +55,13 @@ $(distDir)/%$(extMinJS): $(distDir)/%$(extBundleJS)
 	sh jsminifier.sh --src=$(distDir) --dest=$(distDir) $<
 
 .PHONY: htmlbuild ## Build html.
-htmlbuild:
+htmlbuild: htmlbundle
+
+.PHONY: htmlbundle ## Bundle html.
+htmlbundle: $(html)
+
+$(distDir)/%.html: $(srcDir)/%$(extHtmlTmpl)
+	sh htmlbundler.sh --dest=$(distDir) $<
 
 ##
 .PHONY: imgtest ## Build img test.

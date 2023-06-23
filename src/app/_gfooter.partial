@@ -1,5 +1,5 @@
 {{define "_gfooter.partial" }}
-<footer>
+<footer id="_gfooter">
     <p>
         Thanks to all <a href="https://github.com/grape80/frontend-build-kit/graphs/contributors">contributors</a>.
     </p>

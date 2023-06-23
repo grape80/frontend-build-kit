@@ -5,7 +5,7 @@
         <h1>{{ ._gheader.h1 }}</h1>
         <p>{{ ._gheader.p }}</p>
     </hgroup>
-    <nav id="gnav">
+    <nav id="_gnav">
         <ul>
             <li><a href="#">AAA</a></li>
             <li><a href="#">BBB</a></li>

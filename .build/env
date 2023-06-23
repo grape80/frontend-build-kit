@@ -20,8 +20,8 @@ LOG_RELEASE_DIR=${LOG_DIR}/release
 
 # js
 EXT_ENTRY_JS=.js
-EXT_BUNDLE_JS=.bundle.js
-EXT_MIN_JS=.min.js
+EXT_BUNDLE_JS=.js
+EXT_MIN_JS=.js
 
 # html
 EXT_TMPL_HTML=.gotmpl

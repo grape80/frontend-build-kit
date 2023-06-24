@@ -11,6 +11,16 @@ distDir := $(DIST_DIR)
 logDir := $(LOG_DIR)
 l10nDir := $(L10N_DIR)
 
+# css
+appCSSDir := $(APP_DIR)/$(CSS_DIR)
+extEntryCSS := $(EXT_ENTRY_CSS)
+extBundleCSS := $(EXT_BUNDLE_CSS)
+extMinCSS := $(EXT_MIN_CSS)
+
+entryCSS := $(shell find $(srcDir)/$(appCSSDir) -type f -name '*$(extEntryCSS)' -print | grep -v '/_.*\$(extEntryCSS)$$')
+bundleCSS := $(patsubst $(srcDir)/%, $(tmpDir)/%, $(entryCSS:$(extEntryCSS)=$(extBundleCSS)))
+minCSS := $(patsubst $(tmpDir)/%, $(distDir)/%, $(bundleCSS:$(extBundleCSS)=$(extMinCSS)))
+
 # js
 appJSDir := $(APP_DIR)/$(JS_DIR)
 extEntryJS := $(EXT_ENTRY_JS)
@@ -42,7 +52,19 @@ help:
 imgbuild:
 
 .PHONY: cssbuild ## Build css.
-cssbuild:
+cssbuild: cssbundle cssminify
+
+.PHONY: cssbundle ## Bundle css.
+cssbundle: $(bundleCSS)
+
+$(tmpDir)/%$(extBundleCSS): $(srcDir)/%$(extEntryCSS)
+	sh cssbundler.sh --src=$(srcDir)/$(appCSSDir) --dest=$(tmpDir)/$(appCSSDir) $<
+
+.PHONY: cssminify ## Minify css.
+cssminify: $(minCSS)
+
+$(distDir)/%$(extMinCSS): $(tmpDir)/%$(extBundleCSS)
+	sh cssminifier.sh --src=$(tmpDir)/$(appCSSDir) --dest=$(distDir)/$(appCSSDir) $<
 
 .PHONY: jsbuild ## Build js.
 jsbuild: jsbundle jsminify

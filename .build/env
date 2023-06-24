@@ -18,6 +18,11 @@ LOG_BUILD_DIR=${LOG_DIR}/build
 LOG_TEST_DIR=${LOG_DIR}/test
 LOG_RELEASE_DIR=${LOG_DIR}/release
 
+# css
+EXT_ENTRY_CSS=.scss
+EXT_BUNDLE_CSS=.css
+EXT_MIN_CSS=.css
+
 # js
 EXT_ENTRY_JS=.js
 EXT_BUNDLE_JS=.js

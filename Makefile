@@ -121,24 +121,24 @@ test: imgtest csstest jstest htmltest
 release:
 
 .PHONY: cicd ## Run CI/CD.
-cicd: cleanall build test release
+cicd: clean.all build test release
 
 ##
-.PHONY: cleanlive ## Clean live.
-cleanlive:
+.PHONY: clean.live ## Clean live.
+clean.live:
 	rm -rfv $(liveDir)
 
-.PHONY: cleantmp ## Clean tmp.
-cleantmp:
+.PHONY: clean.tmp ## Clean tmp.
+clean.tmp:
 	rm -rfv $(tmpDir)
 
-.PHONY: cleandist ## Clean dist.
-cleandist:
+.PHONY: clean.dist ## Clean dist.
+clean.dist:
 	rm -rfv $(distDir)
 
-.PHONY: cleanlog ## Clean log.
-cleanlog:
+.PHONY: clean.log ## Clean log.
+clean.log:
 	rm -rfv $(logDir)
 
-.PHONY: cleanall ## Clean all.
-cleanall: cleanlive cleantmp cleandist cleanlog
+.PHONY: clean.all ## Clean all.
+clean.all: clean.live clean.tmp clean.dist clean.log

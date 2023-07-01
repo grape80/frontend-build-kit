@@ -11,6 +11,8 @@ LIVE_DIR=live
 
 TMP_DIR=tmp
 
+BUNDLE_DIR=bundle
+
 DIST_DIR=dist
 
 LOG_DIR=log

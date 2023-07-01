@@ -7,6 +7,7 @@ appDir := $(APP_DIR)
 srcDir := $(SRC_DIR)
 liveDir := $(LIVE_DIR)
 tmpDir := $(TMP_DIR)
+bundleDir := $(BUNDLE_DIR)
 distDir := $(DIST_DIR)
 logDir := $(LOG_DIR)
 l10nDir := $(L10N_DIR)
@@ -37,15 +38,28 @@ extTmplHTML := $(EXT_TMPL_HTML)
 extBundleHTML := $(EXT_BUNDLE_HTML)
 extMinHTML := $(EXT_MIN_HTML)
 
-tmplHTML := $(shell find $(srcDir)/$(appHTMLDir) -type f -name '*$(extTmplHTML)' -print | grep -v '.*/$(l10nDir)/.*')
-bundleHTML := $(patsubst $(srcDir)/%, $(tmpDir)/%, $(tmplHTML:$(extTmplHTML)=$(extBundleHTML)))
-minHTML := $(patsubst $(tmpDir)/%, $(distDir)/%, $(bundleHTML:$(extBundleHTML)=$(extMinHTML)))
+tmplHTML := $(shell find $(srcDir)/$(appHTMLDir) -type f -name '*$(extTmplHTML)' -printf '%P\n' | grep -v '$(l10nDir)')
+bundleHTML := $(tmplHTML:$(extTmplHTML)=$(extBundleHTML))
+minHTML := $(bundleHTML:$(extBundleHTML)=$(extMinHTML))
+
+# l10n
+locales := $(shell cat .build/locales | tr '\n' ' ')
 
 now = $(shell date '+%Y%m%d-%H%M%S')
 
 .PHONY: help ## Show help.
 help:
 	@cat $(MAKEFILE_LIST) | grep '##' | grep -v 'MAKEFILE_LIST' | sed s/^.PHONY:// | awk -F \#\# '{ printf "%-20s%s\n", $$1, $$2 }'
+
+##
+.PHONY: l10n ## Build l10n.
+l10n: $(addprefix l10n., $(locales))
+
+l10n.%:
+	mkdir -p $(tmpDir)/$(appDir)/$*
+	cp -pr $(srcDir)/$(appDir)/* $(tmpDir)/$(appDir)/$*
+	mv -f $(tmpDir)/$(appDir)/$*/$(l10nDir)/$*/* $(tmpDir)/$(appDir)/$*
+	rm -rfv $(tmpDir)/$(appDir)/$*/$(l10nDir)
 
 ##
 .PHONY: imgbuild ## Build img.
@@ -86,16 +100,26 @@ $(distDir)/%$(extMinJS): $(tmpDir)/%$(extBundleJS)
 htmlbuild: htmlbundle htmlminify
 
 .PHONY: htmlbundle ## Bundle html.
-htmlbundle: $(bundleHTML)
+htmlbundle: $(addprefix htmlbundle., $(locales))
 
-$(tmpDir)/%$(extBundleHTML): $(srcDir)/%$(extTmplHTML)
-	sh htmlbundler.sh --src=$(srcDir)/$(appHTMLDir) --dest=$(tmpDir)/$(appHTMLDir) $<
+htmlbundle.%: $(bundleDir)/$(appDir)/%/$(bundleHTML)
+	
+
+$(bundleDir)/$(appDir)/%/$(bundleHTML): $(tmpDir)/$(appDir)/%/$(tmplHTML)
+	sh htmlbundler.sh --src=$(tmpDir)/$(appDir)/$* --dest=$(bundleDir)/$(appDir)/$* $<
+
+.PRECIOUS: $(bundleDir)/$(appDir)/%/$(bundleHTML)
 
 .PHONY: htmlminify ## Minify html.
-htmlminify: $(minHTML)
+htmlminify: $(addprefix htmlminify., $(locales))
 
-$(distDir)/%$(extMinHTML): $(tmpDir)/%$(extBundleHTML)
-	sh htmlminifier.sh --src=$(tmpDir)/$(appHTMLDir) --dest=$(distDir)/$(appHTMLDir) $<
+htmlminify.%: $(distDir)/$(appDir)/%/$(minHTML)
+	
+
+$(distDir)/$(appDir)/%/$(minHTML): $(bundleDir)/$(appDir)/%/$(bundleHTML)
+	sh htmlminifier.sh --src=$(bundleDir)/$(appDir)/$* --dest=$(distDir)/$(appDir)/$* $<
+
+.PRECIOUS: $(distDir)/$(appDir)/%/$(minHTML)
 
 ##
 .PHONY: imgtest ## Build img test.
@@ -132,6 +156,10 @@ clean.live:
 clean.tmp:
 	rm -rfv $(tmpDir)
 
+.PHONY: clean.bundle ## Clean bundle.
+clean.bundle:
+	rm -rfv $(bundleDir)
+
 .PHONY: clean.dist ## Clean dist.
 clean.dist:
 	rm -rfv $(distDir)
@@ -141,4 +169,4 @@ clean.log:
 	rm -rfv $(logDir)
 
 .PHONY: clean.all ## Clean all.
-clean.all: clean.live clean.tmp clean.dist clean.log
+clean.all: clean.live clean.tmp clean.bundle clean.dist clean.log

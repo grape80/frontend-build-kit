@@ -45,6 +45,9 @@ minHTML := $(bundleHTML:$(extBundleHTML)=$(extMinHTML))
 # l10n
 locales := $(shell cat .build/locales | tr '\n' ' ')
 
+# clean
+cleanDirs := $(liveDir) $(tmpDir) $(bundleDir) $(distDir) $(logDir)
+
 now = $(shell date '+%Y%m%d-%H%M%S')
 
 .PHONY: help ## Show help.
@@ -148,25 +151,10 @@ release:
 cicd: clean.all build test release
 
 ##
-.PHONY: clean.live ## Clean live.
-clean.live:
-	rm -rfv $(liveDir)
+.PHONY: clean ## Clean all.
+clean: $(addprefix clean., $(cleanDirs))
 
-.PHONY: clean.tmp ## Clean tmp.
-clean.tmp:
-	rm -rfv $(tmpDir)
-
-.PHONY: clean.bundle ## Clean bundle.
-clean.bundle:
-	rm -rfv $(bundleDir)
-
-.PHONY: clean.dist ## Clean dist.
-clean.dist:
-	rm -rfv $(distDir)
-
-.PHONY: clean.log ## Clean log.
-clean.log:
-	rm -rfv $(logDir)
-
-.PHONY: clean.all ## Clean all.
-clean.all: clean.live clean.tmp clean.bundle clean.dist clean.log
+.PHONY: clean.% ## Clean the specified directory.
+clean.%:
+	test $(findstring $*, $(cleanDirs)) != ''
+	rm -rfv $*

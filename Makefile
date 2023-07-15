@@ -33,12 +33,11 @@ bundleJS := $(patsubst $(srcDir)/%, $(tmpDir)/%, $(entryJS:$(extEntryJS)=$(extBu
 minJS := $(patsubst $(tmpDir)/%, $(distDir)/%, $(bundleJS:$(extBundleJS)=$(extMinJS)))
 
 # html
-appHTMLDir := $(APP_DIR)
 extTmplHTML := $(EXT_TMPL_HTML)
 extBundleHTML := $(EXT_BUNDLE_HTML)
 extMinHTML := $(EXT_MIN_HTML)
 
-tmplHTMLs := $(shell find $(srcDir)/$(appHTMLDir) -type f -name '*$(extTmplHTML)' -printf '%P\n' | grep -v '$(l10nDir)')
+tmplHTMLs := $(shell find $(srcDir)/$(appDir) -type f -name '*$(extTmplHTML)' -printf '%P\n' | grep -v '$(l10nDir)')
 bundleHTMLs := $(tmplHTMLs:$(extTmplHTML)=$(extBundleHTML))
 minHTMLs := $(bundleHTMLs:$(extBundleHTML)=$(extMinHTML))
 

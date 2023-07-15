@@ -38,15 +38,12 @@ extTmplHTML := $(EXT_TMPL_HTML)
 extBundleHTML := $(EXT_BUNDLE_HTML)
 extMinHTML := $(EXT_MIN_HTML)
 
-tmplHTML := $(shell find $(srcDir)/$(appHTMLDir) -type f -name '*$(extTmplHTML)' -printf '%P\n' | grep -v '$(l10nDir)')
-bundleHTML := $(tmplHTML:$(extTmplHTML)=$(extBundleHTML))
-minHTML := $(bundleHTML:$(extBundleHTML)=$(extMinHTML))
+tmplHTMLs := $(shell find $(srcDir)/$(appHTMLDir) -type f -name '*$(extTmplHTML)' -printf '%P\n' | grep -v '$(l10nDir)')
+bundleHTMLs := $(tmplHTMLs:$(extTmplHTML)=$(extBundleHTML))
+minHTMLs := $(bundleHTMLs:$(extBundleHTML)=$(extMinHTML))
 
 # l10n
 locales := $(shell cat .build/locales | tr '\n' ' ')
-
-# clean
-cleanDirs := $(liveDir) $(tmpDir) $(bundleDir) $(distDir) $(logDir)
 
 now = $(shell date '+%Y%m%d-%H%M%S')
 
@@ -99,30 +96,32 @@ $(distDir)/%$(extMinJS): $(tmpDir)/%$(extBundleJS)
 	sh jsminifier.sh --src=$(tmpDir)/$(appJSDir) --dest=$(distDir)/$(appJSDir) $<
 
 ##
-.PHONY: htmlbuild ## Build html.
-htmlbuild: htmlbundle htmlminify
+.PHONY: html.build ## Build html.
+html.build: html.bundle html.minify
 
-.PHONY: htmlbundle ## Bundle html.
-htmlbundle: $(addprefix htmlbundle., $(locales))
+.PHONY: html.bundle ## Bundle html for all locales.
+html.bundle: $(addprefix html.bundle., $(locales))
 
-htmlbundle.%: $(bundleDir)/$(appDir)/%/$(bundleHTML)
+.PHONY: html.bundle.%  ## Bundle the specified locale html.
+html.bundle.%: $(foreach bundleHTML, $(bundleHTMLs), $(bundleDir)/$(appDir)/%/$(bundleHTML))
 	
 
-$(bundleDir)/$(appDir)/%/$(bundleHTML): $(tmpDir)/$(appDir)/%/$(tmplHTML)
-	sh htmlbundler.sh --src=$(tmpDir)/$(appDir)/$* --dest=$(bundleDir)/$(appDir)/$* $<
+$(bundleDir)/$(appDir)/%$(extBundleHTML): $(tmpDir)/$(appDir)/%$(extTmplHTML)
+	sh htmlbundler.sh --src=$(shell echo $< | cut -d '/' -f 1-3) --dest=$(shell echo $@ | cut -d '/' -f 1-3) $<
 
-.PRECIOUS: $(bundleDir)/$(appDir)/%/$(bundleHTML)
+.PRECIOUS: $(bundleDir)/$(appDir)/%$(extBundleHTML)
 
-.PHONY: htmlminify ## Minify html.
-htmlminify: $(addprefix htmlminify., $(locales))
+.PHONY: html.minify ## Minify html for all locales.
+html.minify: $(addprefix html.minify., $(locales))
 
-htmlminify.%: $(distDir)/$(appDir)/%/$(minHTML)
+.PHONY: html.minify.% ## Minify the specified locale html.
+html.minify.%: $(foreach minHTML, $(minHTMLs), $(distDir)/$(appDir)/%/$(minHTML))
 	
 
-$(distDir)/$(appDir)/%/$(minHTML): $(bundleDir)/$(appDir)/%/$(bundleHTML)
-	sh htmlminifier.sh --src=$(bundleDir)/$(appDir)/$* --dest=$(distDir)/$(appDir)/$* $<
+$(distDir)/$(appDir)/%$(extMinHTML): $(bundleDir)/$(appDir)/%$(extBundleHTML)
+	sh htmlminifier.sh --src=$(shell echo $< | cut -d '/' -f 1-3) --dest=$(shell echo $@ | cut -d '/' -f 1-3) $<
 
-.PRECIOUS: $(distDir)/$(appDir)/%/$(minHTML)
+.PRECIOUS: $(distDir)/$(appDir)/%$(extMinHTML)
 
 ##
 .PHONY: imgtest ## Build img test.
@@ -151,6 +150,8 @@ release:
 cicd: clean.all build test release
 
 ##
+cleanDirs := $(liveDir) $(tmpDir) $(bundleDir) $(distDir) $(logDir)
+
 .PHONY: clean ## Clean all.
 clean: $(addprefix clean., $(cleanDirs))
 

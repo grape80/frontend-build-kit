@@ -23,14 +23,13 @@ bundleCSS := $(patsubst $(srcDir)/%, $(tmpDir)/%, $(entryCSS:$(extEntryCSS)=$(ex
 minCSS := $(patsubst $(tmpDir)/%, $(distDir)/%, $(bundleCSS:$(extBundleCSS)=$(extMinCSS)))
 
 # js
-appJSDir := $(APP_DIR)/$(JS_DIR)
 extEntryJS := $(EXT_ENTRY_JS)
 extBundleJS := $(EXT_BUNDLE_JS)
 extMinJS := $(EXT_MIN_JS)
 
-entryJS := $(shell find $(srcDir)/$(appJSDir) -type f -name '*$(extEntryJS)' -print | grep -v '/_.*\$(extEntryJS)$$')
-bundleJS := $(patsubst $(srcDir)/%, $(tmpDir)/%, $(entryJS:$(extEntryJS)=$(extBundleJS)))
-minJS := $(patsubst $(tmpDir)/%, $(distDir)/%, $(bundleJS:$(extBundleJS)=$(extMinJS)))
+entryJSs := $(shell find $(srcDir)/$(appDir) -type f -name '*$(extEntryJS)' -printf '%P\n' | grep -v '/_.*\$(extEntryJS)$$')
+bundleJSs := $(entryJSs:$(extEntryJS)=$(extBundleJS))
+minJSs := $(bundleJSs:$(extBundleJS)=$(extMinJS))
 
 # html
 extTmplHTML := $(EXT_TMPL_HTML)
@@ -79,20 +78,33 @@ cssminify: $(minCSS)
 $(distDir)/%$(extMinCSS): $(tmpDir)/%$(extBundleCSS)
 	sh cssminifier.sh --src=$(tmpDir)/$(appCSSDir) --dest=$(distDir)/$(appCSSDir) $<
 
-.PHONY: jsbuild ## Build js.
-jsbuild: jsbundle jsminify
+##
+.PHONY: js.build ## Build js.
+js.build: js.bundle js.minify
 
-.PHONY: jsbundle ## Bundle js.
-jsbundle: $(bundleJS)
+.PHONY: js.bundle ## Bundle js for all locales.
+js.bundle: $(addprefix js.bundle., $(locales))
 
-$(tmpDir)/%$(extBundleJS): $(srcDir)/%$(extEntryJS)
-	sh jsbundler.sh --src=$(srcDir)/$(appJSDir) --dest=$(tmpDir)/$(appJSDir) $<
+.PHONY: js.bundle.%  ## Bundle the specified locale js.
+js.bundle.%: $(foreach bundleJS, $(bundleJSs), $(bundleDir)/$(appDir)/%/$(bundleJS))
+	
 
-.PHONY: jsminify ## Minify js.
-jsminify: $(minJS)
+$(bundleDir)/$(appDir)/%$(extBundleJS): $(tmpDir)/$(appDir)/%$(extEntryJS)
+	sh jsbundler.sh --src=$(shell echo $< | cut -d '/' -f 1-3) --dest=$(shell echo $@ | cut -d '/' -f 1-3) $<
 
-$(distDir)/%$(extMinJS): $(tmpDir)/%$(extBundleJS)
-	sh jsminifier.sh --src=$(tmpDir)/$(appJSDir) --dest=$(distDir)/$(appJSDir) $<
+.PRECIOUS: $(bundleDir)/$(appDir)/%$(extBundleJS)
+
+.PHONY: js.minify ## Minify js for all locales.
+js.minify: $(addprefix js.minify., $(locales))
+
+.PHONY: js.minify.% ## Minify the specified locale js.
+js.minify.%: $(foreach minJS, $(minJSs), $(distDir)/$(appDir)/%/$(minJS))
+	
+
+$(distDir)/$(appDir)/%$(extMinJS): $(bundleDir)/$(appDir)/%$(extBundleJS)
+	sh jsminifier.sh --src=$(shell echo $< | cut -d '/' -f 1-3) --dest=$(shell echo $@ | cut -d '/' -f 1-3) $<
+
+.PRECIOUS: $(distDir)/$(appDir)/%$(extMinJS)
 
 ##
 .PHONY: html.build ## Build html.
